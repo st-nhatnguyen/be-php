@@ -19,10 +19,12 @@ return new class extends Migration
             $table->integer('status');
             $table->dateTime('start_date');
             $table->dateTime('due_date');
-            $table->bigInteger('assignee')->foreignIdFor(User::class);
+            $table->uuid('assignee');
+            $table->foreign('assignee')->references('uuid')->on('users');
             $table->double('estimate');
             $table->double('actual');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

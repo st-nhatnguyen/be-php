@@ -2,71 +2,45 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use Illuminate\Http\Request;
+use App\Http\Requests\DeleteUserRequest;
+use App\Http\Requests\ShowUserRequest;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
+use App\Http\Resources\UserCollection;
+use App\Http\Resources\UserResource;
+use App\Repositories\Repository\UserRepository;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $userRepository;
+
+    public function __construct(UserRepository $userRepository)
+    {
+        $this->userRepository = $userRepository;
+    }
+
     public function index()
     {
-        return User::all();
+        return new UserCollection($this->userRepository->all());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => $request->password
-        ]);
+        return new UserResource($this->userRepository->create($request->validated()));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(ShowUserRequest $request)
     {
-        return User::where('id', $id)->first();
+        return new UserResource($this->userRepository->getById($request['uuid']));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request)
+    public function update(UpdateUserRequest $request)
     {
-        User::where('id', $request->id)
-            ->update([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => $request->password
-            ]);
+        return new UserResource($this->userRepository->update($request->validated()));
     }
 
-    /**
-     * 
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Request $request)
+    public function destroy(DeleteUserRequest $request)
     {
-        User::find($request->id)->delete();
-    }
-
-    public function trash()
-    {
-        return User::onlyTrashed()->get();
-    }
-
-    public function restore(Request $request)
-    {
-        return User::withTrashed()
-            ->where('id', $request->id)
-            ->restore();
-        ;
+        return new UserResource($this->userRepository->delete($request->validated()['uuid']));
     }
 }

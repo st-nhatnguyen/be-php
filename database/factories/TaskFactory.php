@@ -25,7 +25,7 @@ class TaskFactory extends Factory
             'status' => rand(0, 1),
             'start_date' => now(),
             'due_date' => now(),
-            'assignee' => User::all()->random()->id,
+            'assignee' => User::all()->random()->uuid,
             'estimate' => fake()->randomFloat(),
             'actual' => fake()->randomFloat(),
         ];

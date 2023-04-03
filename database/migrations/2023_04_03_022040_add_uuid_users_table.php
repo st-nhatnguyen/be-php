@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->softDeletes();
+            $table->dropColumn('id');
+            $table->uuid('uuid')->primary();
         });
     }
 
@@ -22,7 +23,11 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropSoftDeletes();
+            $table->dropPrimary('uuid');
+            $table->dropColumn('uuid');
+        });
+        Schema::table('users', function (Blueprint $table) {
+            $table->id();
         });
     }
 };
